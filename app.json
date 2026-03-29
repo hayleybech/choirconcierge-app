@@ -4,7 +4,7 @@
     "slug": "choirconcierge-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon-pwa.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -22,7 +22,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon-pwa.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#f3f4f6"
       },
       "edgeToEdgeEnabled": true,
