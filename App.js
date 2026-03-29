@@ -44,7 +44,12 @@ export default function App() {
     <SafeAreaView className="flex-1 bg-white" onLayout={onLayoutRootView}>
       <View className="flex-1">
         <WebView 
-          source={{ uri: 'https://choirconcierge.com/app' }} 
+          source={{
+            uri: 'https://choirconcierge.com/app',
+            headers: {
+              'X-WebView-Source': 'react-native-app', // Custom header
+            },
+          }}
           style={{ flex: 1 }}
         />
       </View>

@@ -1,24 +1,29 @@
 {
   "expo": {
-    "name": "choirconcierge-app",
+    "name": "Choir Concierge",
     "slug": "choirconcierge-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon-pwa.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#f3f4f6",
+      "imageWidth": 200,
+      "dark": {
+        "image": "./assets/splash-logo-dark.png",
+        "backgroundColor": "#200142"
+      }
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/icon-pwa.png",
+        "backgroundColor": "#f3f4f6"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.hayleybech.choirconciergeapp"
