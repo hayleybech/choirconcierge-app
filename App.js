@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { WebView } from 'react-native-webview';
 import * as SplashScreen from 'expo-splash-screen';
-import {SafeAreaView} from "react-native-safe-area-context";
+import {SafeAreaView, SafeAreaProvider} from "react-native-safe-area-context";
 import {View} from "react-native";
 import * as SecureStore from 'expo-secure-store';
 import LoginScreen from './LoginScreen';
@@ -21,6 +21,7 @@ export default function App() {
         const isSecureStoreAvailable = await SecureStore.isAvailableAsync();
         
         if (isSecureStoreAvailable) {
+          SecureStore.deleteItemAsync('userToken');
           // Check for an existing token in SecureStore
           const token = await SecureStore.getItemAsync('userToken');
           if (token) {
@@ -56,24 +57,26 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white" onLayout={onLayoutRootView}>
-      <View className="flex-1">
-        {!userToken ? (
-          <LoginScreen onLoginSuccess={setUserToken} />
-        ) : (
-          <WebView 
-            source={{
-              uri: 'https://choirconcierge.com/app',
-              headers: {
-                'X-WebView-Source': 'react-native-app', // Custom header
-                'Authorization': `Bearer ${userToken}`,
-              },
-            }}
-            style={{ flex: 1 }}
-          />
-        )}
-      </View>
-      <StatusBar style="auto" />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView className="flex-1 bg-white" onLayout={onLayoutRootView}>
+        <View className="flex-1">
+          {!userToken ? (
+            <LoginScreen onLoginSuccess={setUserToken} />
+          ) : (
+            <WebView 
+              source={{
+                uri: 'https://choirconcierge.com/app',
+                headers: {
+                  'X-WebView-Source': 'react-native-app', // Custom header
+                  'Authorization': `Bearer ${userToken}`,
+                },
+              }}
+              style={{ flex: 1 }}
+            />
+          )}
+        </View>
+        <StatusBar style="auto" />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
