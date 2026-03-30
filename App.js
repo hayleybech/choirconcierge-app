@@ -2,23 +2,40 @@ import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useState } from 'react';
 import { WebView } from 'react-native-webview';
 import * as SplashScreen from 'expo-splash-screen';
-import {SafeAreaView} from "react-native-safe-area-context";
+import {SafeAreaView, SafeAreaProvider} from "react-native-safe-area-context";
 import {View} from "react-native";
+import * as SecureStore from 'expo-secure-store';
+import LoginScreen from './LoginScreen';
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
+  const [userToken, setUserToken] = useState(null);
 
   useEffect(() => {
     async function prepare() {
       try {
-        // Pre-load fonts, make any API calls you need to do here
-        // For now, just simulate a delay for loading resources
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Check if SecureStore is available before using it
+        const isSecureStoreAvailable = await SecureStore.isAvailableAsync();
+        
+        if (isSecureStoreAvailable) {
+          SecureStore.deleteItemAsync('userToken');
+          // Check for an existing token in SecureStore
+          const token = await SecureStore.getItemAsync('userToken');
+          if (token) {
+            setUserToken(token);
+          }
+        } else {
+          console.warn('SecureStore is not available on this platform/device.');
+          // In a real app, we might fall back to AsyncStorage or handle it appropriately.
+        }
+        
+        // Simulating resource loading
+        await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (e) {
-        console.warn(e);
+        console.warn('Error during SecureStore operation:', e);
       } finally {
         // Tell the application to render
         setAppIsReady(true);
@@ -30,8 +47,7 @@ export default function App() {
 
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {
-      // This tells the splash screen to hide immediately! If we need this to stay
-      // visible until the WebView is loaded, we could handle it differently.
+      // This tells the splash screen to hide immediately!
       await SplashScreen.hideAsync();
     }
   }, [appIsReady]);
@@ -41,19 +57,26 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white" onLayout={onLayoutRootView}>
-      <View className="flex-1">
-        <WebView 
-          source={{
-            uri: 'https://choirconcierge.com/app',
-            headers: {
-              'X-WebView-Source': 'react-native-app', // Custom header
-            },
-          }}
-          style={{ flex: 1 }}
-        />
-      </View>
-      <StatusBar style="auto" />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView className="flex-1 bg-white" onLayout={onLayoutRootView}>
+        <View className="flex-1">
+          {!userToken ? (
+            <LoginScreen onLoginSuccess={setUserToken} />
+          ) : (
+            <WebView 
+              source={{
+                uri: 'https://choirconcierge.com/app',
+                headers: {
+                  'X-WebView-Source': 'react-native-app', // Custom header
+                  'Authorization': `Bearer ${userToken}`,
+                },
+              }}
+              style={{ flex: 1 }}
+            />
+          )}
+        </View>
+        <StatusBar style="auto" />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
